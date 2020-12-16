@@ -6,6 +6,7 @@ from os import path
 import time
 import pickle
 import re
+from selenium.common.exceptions import NoSuchElementException
 
 def Init():
     if (path.exists("./cookies_tmp.pickle")):
@@ -62,7 +63,7 @@ def openGoogleMeets(classroom_title, class_length):
     time.sleep(2)
 
     try:
-        link = re.search(r"(https:\/\/meet\.google\.com\/lookup\/.*\?)", driver.page_source).group(0)
+        link = re.search(r"(https:\/\/meet\.google\.com\/lookup\/.*\?authuser)", driver.page_source).group(0)
     except Exception:
         print("Could not find the classroom link")
         return
@@ -71,11 +72,32 @@ def openGoogleMeets(classroom_title, class_length):
         return
          
     driver.get(link)
+    
+    try:
+        driver.find_element(By.XPATH, "//*[@data-tooltip='Turn off microphone (ctrl + d)']").click()
+    except NoSuchElementException:
+        try:
+            driver.find_element(By.XPATH, "//*[@data-tooltip='Mikrofon kikapcsolása (ctrl + d)']").click()
+        except NoSuchElementException:
+            print("Could not find the microphone button")       
 
-    time.sleep(2)
-    driver.find_element(By.XPATH, "//*[@data-tooltip='Turn off microphone (ctrl + d)']").click()
+    try:
+        driver.find_element(By.XPATH, "//*[@data-tooltip='Turn off camera (ctrl + e)']").click()
+    except NoSuchElementException:
+        try:
+            driver.find_element(By.XPATH, "//*[@data-tooltip='Kamera kikapcsolása (ctrl + e)']").click()
+        except NoSuchElementException:
+            print("Could not find the camera button")
+
     time.sleep(1)
-    driver.find_element(By.XPATH, '//*[text()="Join now"]').click()
+
+    try:
+        driver.find_element(By.XPATH, '//*[text()="Join now"]').click()
+    except NoSuchElementException:
+        try:
+            driver.find_element(By.XPATH, '//*[text()="Belépés"]').click()
+        except NoSuchElementException:
+            print("Could not find the join button")
     time.sleep(class_length)
     driver.close()
 
