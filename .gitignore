@@ -5,3 +5,8 @@ cookies
 page.html
 build/*
 cookies_tmp.pickle
+dist/*
+__pycache__/*
+*.spec
+favicon.ico
+*.zip
